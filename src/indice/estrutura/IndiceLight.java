@@ -34,7 +34,7 @@ public class IndiceLight extends Indice
 	 * id incremental dos termos.
 	 */
 	private int lastTermId = 0;
-	
+	private double newSize = 0.1;
 	
 	
 	
@@ -44,6 +44,11 @@ public class IndiceLight extends Indice
 		arrTermId = new int[initCap];
 		arrFreqTermo = new int[initCap];
 		posicaoIndice = new HashMap<String,PosicaoVetor>();
+	}
+	
+	public static int[] aumentaCapacidadeVetor(int[] vetor, double d) {
+		int novo[] = Arrays.copyOf(vetor, (int)Math.round(vetor.length * (1.0 + d)));
+		return novo;
 	}
 	
 	@Override
@@ -69,21 +74,33 @@ public class IndiceLight extends Indice
 	@Override
 	public void index(String termo,int docId,int freqTermo)
 	{
-
+		int idx;
 		
+		if (posicaoIndice.containsKey(termo)) {
+			idx = posicaoIndice.get(termo).getIdTermo();
+		} else {
+			idx = ++lastTermId;
+			posicaoIndice.put(termo, new PosicaoVetor(idx));
+		}
 		
+		lastIdx++;
+		if(lastIdx == arrTermId.length) {
+			arrDocId = aumentaCapacidadeVetor(arrDocId, newSize);
+			arrTermId = aumentaCapacidadeVetor(arrTermId, newSize);
+			arrFreqTermo = aumentaCapacidadeVetor(arrFreqTermo, newSize);
+			System.gc();
+		}
 		
+		arrTermId[lastIdx] = idx;
+		arrDocId[lastIdx] = docId;
+		arrFreqTermo[lastIdx] = freqTermo;
 	}
 
-	
-
-
-	
 	
 	@Override
 	public Map<String,Integer> getNumDocPerTerm()
 	{
-
+									
 	}
 	
 	@Override
