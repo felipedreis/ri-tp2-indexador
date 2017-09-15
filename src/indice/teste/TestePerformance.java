@@ -15,13 +15,10 @@ public class TestePerformance {
     public long usedMem() {
         return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     }
-	@Test
-	public void testIndexPerformance() {
+    
+    private long testIndex(Indice indiceTeste) {
+
 		long usedMemNow,usedMemBefore;
-		//indiceTeste = new IndiceSimples();
-		indiceTeste = new IndiceLight(15000);
-		
-		
 		//cria um vocabulario de 25*25*25 (15625) palavras
 		String[] vocabulario = new String[25*25*25];
 		int count = 0;
@@ -62,7 +59,7 @@ public class TestePerformance {
 					//System.out.println("Index: "+count);
 					count = (count+1)%15625;
 					if(countTotal % 100000==0){
-						System.out.println("Indexando ocorrencia #"+countTotal);
+						//System.out.println("Indexando ocorrencia #"+countTotal);
 					}
 					countTotal++;
 				}
@@ -77,6 +74,18 @@ public class TestePerformance {
 		System.out.println("mem. now: "+usedMemNow/(1024.0*1024));
 		
 		System.out.println("Uso de memória para indexar: "+(usedMemNow-usedMemBefore)/(1024.0*1024.0)+" mb");
+		return usedMemNow - usedMemBefore;
+    }
+    
+	@Test
+	public void testIndexPerformance() {
+		
+		long memSimples = testIndex(new IndiceSimples());
+		System.gc();
+		long memLight = testIndex(new IndiceLight(15000));
+		
+		double ratio = memSimples / (double)memLight;
+		System.out.println("Ratio: " + ratio);
 	}
 
 }

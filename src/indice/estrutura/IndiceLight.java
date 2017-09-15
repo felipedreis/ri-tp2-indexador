@@ -20,6 +20,10 @@ public class IndiceLight extends Indice
 
 
 	private Map<String,PosicaoVetor> posicaoIndice;
+	private Set<Integer> documentos;
+	
+	private String[] posicaoIndiceReverso;
+	
 	private int[] arrDocId;
 	private int[] arrTermId;
 	private int[] arrFreqTermo;
@@ -43,7 +47,9 @@ public class IndiceLight extends Indice
 		arrDocId = new int[initCap];
 		arrTermId = new int[initCap];
 		arrFreqTermo = new int[initCap];
+		posicaoIndiceReverso = new String[initCap];
 		posicaoIndice = new HashMap<String,PosicaoVetor>();
+		documentos = new HashSet<>();
 	}
 	
 	public static int[] aumentaCapacidadeVetor(int[] vetor, double d) {
@@ -54,7 +60,7 @@ public class IndiceLight extends Indice
 	@Override
 	public int getNumDocumentos()
 	{
-
+		return documentos.size();
 	}
 
 	/**
@@ -81,6 +87,10 @@ public class IndiceLight extends Indice
 		} else {
 			idx = ++lastTermId;
 			posicaoIndice.put(termo, new PosicaoVetor(idx));
+			
+			if (idx >= posicaoIndiceReverso.length)
+				posicaoIndiceReverso = Arrays.copyOf(posicaoIndiceReverso, (int)(posicaoIndiceReverso.length * 1.1));
+			posicaoIndiceReverso[idx] = termo;
 		}
 		
 		lastIdx++;
@@ -94,25 +104,39 @@ public class IndiceLight extends Indice
 		arrTermId[lastIdx] = idx;
 		arrDocId[lastIdx] = docId;
 		arrFreqTermo[lastIdx] = freqTermo;
+		documentos.add(docId);
 	}
 
 	
 	@Override
 	public Map<String,Integer> getNumDocPerTerm()
 	{
-									
+		Map<String,Integer> map = new HashMap<>();
+		
+		for(Map.Entry<String, PosicaoVetor> e:posicaoIndice.entrySet()){
+			map.put(e.getKey(), e.getValue().getNumDocumentos());
+		}
+		
+		return map;
 	}
 	
 	@Override
 	public Set<String> getListTermos()
 	{
-
+		return posicaoIndice.keySet();
 	}
 	
 	@Override
 	public List<Ocorrencia> getListOccur(String termo)
 	{
-
+		PosicaoVetor pos = posicaoIndice.get(termo);
+		List<Ocorrencia> ocorrencias = new ArrayList<>();
+		int offset = pos.getPosInicial();
+		for(int i = 0; i < pos.getNumDocumentos(); ++i) {
+			ocorrencias.add(new Ocorrencia(arrDocId[offset + i], arrFreqTermo[offset + i]));
+		}
+		
+		return ocorrencias;
 	}
 	
 	/**
@@ -130,9 +154,32 @@ public class IndiceLight extends Indice
 	 */
 	@Override
 	public void concluiIndexacao(){
-
+		ordenaIndice();
+		String termo;
+		PosicaoVetor pos;
+		int idx = arrTermId[0];
+		int count = 1;
+		int firstOccurrence = 0;
+		for(int i = 1; i < lastIdx; ++i) {
+			if (arrTermId[i] == idx) {
+				count++;
+				continue;
+			} else {
+				termo = posicaoIndiceReverso[idx];
+				pos = posicaoIndice.get(termo);
+				pos.setNumDocumentos(count);
+				pos.setPosInicial(firstOccurrence);
+				
+				firstOccurrence = i;
+				count = 1;
+				idx = arrTermId[i];
+			}
+		}
 		
-
+		termo = posicaoIndiceReverso[idx];
+		pos = posicaoIndice.get(termo);
+		pos.setNumDocumentos(count);
+		pos.setPosInicial(firstOccurrence);
 	}
 
 	public void ordenaIndice()
