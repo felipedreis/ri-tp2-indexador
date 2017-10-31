@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  *         Window - Preferences - Java - Code Style - Code Templates
  */
 public class StringUtil {
-	private static String END_STOP_WORDS = "/home/hasan/data/dumps/stopWords.csv";
+	private static String END_STOP_WORDS = "src/util/stopwords.txt";
 	// private static String END_STOP_WORDS =
 	// "/home/curupira/hasan/stopWords.csv";
 	public static final String APENAS_ACENTOS = ((char) 225) + "-"
@@ -36,8 +36,12 @@ public class StringUtil {
 	public static String[] REPLACES = { "a", "e", "i", "o", "u" };
 
 	public static Pattern[] PATTERNS_ACENTO = null;
+	public static Pattern[] PATTERNS_PUNCTUATION = null;
+	public static int PATTERNS_PUNCTUATION_SIZE = 1;
 
 	public static void compilePatterns() {
+		PATTERNS_PUNCTUATION = new Pattern[PATTERNS_PUNCTUATION_SIZE];
+		PATTERNS_PUNCTUATION[0] = Pattern.compile("[\"':,!().?;-]");
 		PATTERNS_ACENTO = new Pattern[REPLACES.length];
 		PATTERNS_ACENTO[0] = Pattern.compile("[âãáàä]",
 				Pattern.CASE_INSENSITIVE);
@@ -121,6 +125,22 @@ public class StringUtil {
 	}
 	public static String encodeXML(String txt) {
 		return txt.replaceAll("&", "&amp;");
+	}
+
+	/**
+	 * @author Higor/Vinícius/Renan/Felipe
+	 */
+	public static String retiraStopWords(String text){
+		String new_text = text.replaceAll("[\"':,!().?;-]", "");
+		String[] words = new_text.split(" ");
+		for (int i = 0;i < words.length;i++){
+			if(isStopWord(words[i])){
+				new_text = new_text.replaceAll(words[i]+" ","");
+				new_text = new_text.replaceAll(words[i],"");
+			}
+		}
+		new_text = new_text.replaceAll(" $","");
+		return new_text;
 	}
 
 	public static void main(String[] args) {
