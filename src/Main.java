@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Main{
-    private static IndiceLight indice = new IndiceLight(10000);
+    private static IndiceLight indice = new IndiceLight(15000000);
     public static void main(String[] args){
         String main_folder_pathname = "/home/higor/Documentos/Engenharia de Computação - CEFET MG/7º período/RI/TP 2/Documentos Wiki/wikiSample";
         long startTime = System.currentTimeMillis();
@@ -19,14 +19,10 @@ public class Main{
         indice.concluiIndexacao();
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
-        System.out.print("Tempo para indexacao: ");
+        System.out.print("Tempo para indexacao (s): ");
         System.out.println(elapsedTime);
         System.out.print("Numero de documentos indexados: ");
         System.out.println(indice.getNumDocumentos());
-        System.out.println("Termos indexados:");
-        for(String word : indice.getListTermos()){
-            System.out.println(word);
-        }
         System.out.println("Total de termos indexados: "+indice.getListTermos().size());
     }
 
@@ -97,14 +93,12 @@ public class Main{
                     Document doc = Jsoup.parse(String.valueOf(fileContent));
                     String text = doc.body().text();
                     text = StringUtil.replaceAcento(text);
-                    System.out.println(text);
                     Set<String> nonStopwords;
                     nonStopwords = StringUtil.retiraStopWords(text);
                     indexacao(nonStopwords,docid);
                     docid++;
                 }
             }
-            break;
         }
     }
 }
