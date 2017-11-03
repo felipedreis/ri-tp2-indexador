@@ -8,8 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Main{
     private static IndiceLight indice = new IndiceLight(10000);
@@ -20,8 +19,15 @@ public class Main{
         indice.concluiIndexacao();
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
+        System.out.print("Tempo para indexacao: ");
         System.out.println(elapsedTime);
+        System.out.print("Numero de documentos indexados: ");
         System.out.println(indice.getNumDocumentos());
+        System.out.println("Termos indexados:");
+        for(String word : indice.getListTermos()){
+            System.out.println(word);
+        }
+        System.out.println("Total de termos indexados: "+indice.getListTermos().size());
     }
 
 	public static String stemming(String word){
@@ -41,13 +47,11 @@ public class Main{
         return wordStemmed;
     }
 
-	public static void indexacao(String text,int docid){
+	public static void indexacao(Set<String> nonStopwords,int docid){
         // mapa que conta a frequencia de cada termo em um documento
         Map<String,Integer> freq_termos = new HashMap<String,Integer>();
-        // divide o texto em uma lista de palavras
-        String[] words = text.split(" ");
         String wordStemmed;
-        for(String word : words){
+        for(String word : nonStopwords){
             // verifica se existe o stem de uma palavra tanto em ingles quanto em portugues
             wordStemmed = stemming(word);
             // calcula a frequencia do termo no documento
@@ -60,7 +64,7 @@ public class Main{
             }
         }
         // indexa os termos apos o stemming e calculo da frequencia
-        for(String word: words) {
+        for(String word: nonStopwords) {
             wordStemmed = stemming(word);
             indice.index(wordStemmed,docid,freq_termos.get(wordStemmed));
         }
@@ -74,6 +78,7 @@ public class Main{
         for (int i = 0; i < listOfFolders.length; i++) {
             if (listOfFolders[i].isDirectory()) {
                 File folder = new File("/home/higor/Documentos/Engenharia de Computação - CEFET MG/7º período/RI/TP 2/Documentos Wiki/wikiSample/" + listOfFolders[i].getName());
+                System.out.println("Indexando pasta: "+listOfFolders[i].getName());
                 File[] listOfFiles = folder.listFiles();
                 assert listOfFiles != null;
                 for (int j = 0; j < listOfFiles.length; j++) {
@@ -91,13 +96,15 @@ public class Main{
                     }
                     Document doc = Jsoup.parse(String.valueOf(fileContent));
                     String text = doc.body().text();
-                    text = StringUtil.retiraStopWords(text);
                     text = StringUtil.replaceAcento(text);
-                    indexacao(text,docid);
+                    System.out.println(text);
+                    Set<String> nonStopwords;
+                    nonStopwords = StringUtil.retiraStopWords(text);
+                    indexacao(nonStopwords,docid);
                     docid++;
                 }
-                break;
             }
+            break;
         }
     }
 }

@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,17 +128,18 @@ public class StringUtil {
 	/**
 	 * @author Higor/Vinícius/Renan/Felipe
 	 */
-	public static String retiraStopWords(String text){
-		String new_text = text.replaceAll("[\"':,!().?;-]", "");
-		String[] words = new_text.split(" ");
+	public static Set<String> retiraStopWords(String text){
+		// retira a pontuacao do texto
+		String new_text = text.replaceAll("[\\[\\].,\\/#!$%\\^&\\*;:{}=\\-_`~()—\"]", "");
+		// divide o texto em uma lista de palavras
+		String[] words = new_text.split("\\s+");
+		Set<String> nonStopwords = new HashSet<String>();
 		for (int i = 0;i < words.length;i++){
-			if(isStopWord(words[i])){
-				new_text = new_text.replaceAll(words[i]+" ","");
-				new_text = new_text.replaceAll(words[i],"");
+			if(!isStopWord(words[i].toLowerCase())){
+				nonStopwords.add(words[i].toLowerCase());
 			}
 		}
-		new_text = new_text.replaceAll(" $","");
-		return new_text;
+		return nonStopwords;
 	}
 
 	public static void main(String[] args) {
