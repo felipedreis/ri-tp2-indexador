@@ -1,3 +1,4 @@
+import indice.estrutura.Indice;
 import indice.estrutura.IndiceLight;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,8 +13,11 @@ import java.util.*;
 
 public class Main{
     private static IndiceLight indice = new IndiceLight(15000000);
-    public static void main(String[] args){
-        String main_folder_pathname = "/home/higor/Documentos/Engenharia de Computação - CEFET MG/7º período/RI/TP 2/Documentos Wiki/wikiSample";
+
+    public static void main(String[] args) throws IOException {
+
+        String main_folder_pathname = "../wikiSample";
+
         long startTime = System.currentTimeMillis();
         processaDocumentos(main_folder_pathname);
         indice.concluiIndexacao();
@@ -24,6 +28,14 @@ public class Main{
         System.out.print("Numero de documentos indexados: ");
         System.out.println(indice.getNumDocumentos());
         System.out.println("Total de termos indexados: "+indice.getListTermos().size());
+
+        // Grava indice em arquivo
+        File file = new File("../indice.dat");
+        indice.gravarIndice(file);
+        /*  Carrega índice de arquivo
+        file = new File("../indice.dat");
+        IndiceLight novo = (IndiceLight) Indice.leIndice(file);
+        */
     }
 
 	public static String stemming(String word){
@@ -73,7 +85,7 @@ public class Main{
         assert listOfFolders != null;
         for (int i = 0; i < listOfFolders.length; i++) {
             if (listOfFolders[i].isDirectory()) {
-                File folder = new File("/home/higor/Documentos/Engenharia de Computação - CEFET MG/7º período/RI/TP 2/Documentos Wiki/wikiSample/" + listOfFolders[i].getName());
+                File folder = new File("../wikiSample/" + listOfFolders[i].getName());
                 System.out.println("Indexando pasta: "+listOfFolders[i].getName());
                 File[] listOfFiles = folder.listFiles();
                 assert listOfFiles != null;
@@ -99,6 +111,7 @@ public class Main{
                     docid++;
                 }
             }
+            break;
         }
     }
 }

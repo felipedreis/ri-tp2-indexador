@@ -10,7 +10,7 @@ import java.util.Set;
 
 
 
-public class IndiceLight extends Indice  
+public class IndiceLight extends Indice
 {
 	
 	/**

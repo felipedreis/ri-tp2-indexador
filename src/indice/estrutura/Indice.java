@@ -1,7 +1,6 @@
 package indice.estrutura;
 
-import java.io.File;
-import java.io.Serializable;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ public abstract class Indice implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+
 	/**
 	 * Retorna o número de documentos existentes neste índice
 	 */
@@ -22,7 +22,8 @@ public abstract class Indice implements Serializable {
 	 * Retorna a lista de termos (vocabulário) deste índice
 	 */
 	public abstract Set<String> getListTermos();
-	
+
+
 	/**
 	 * Indexa um terminado termo que ocorreu freqTermo vezes em um determinado documento docId
 	 * @param termo
@@ -30,7 +31,8 @@ public abstract class Indice implements Serializable {
 	 * @param freqTermo
 	 */
 	public abstract void index(String termo,int docId,int freqTermo);
-	
+
+
 	/**
 	 * Retorna, para cada termo, o número de documentos que este termo ocorreu.
 	 * Exemplo:
@@ -44,7 +46,8 @@ public abstract class Indice implements Serializable {
 	 * @return
 	 */
 	public abstract Map<String,Integer> getNumDocPerTerm();
-	
+
+
 	/**
 	 * Retorna a lista de ocorrencias de um determinado termo.
 	 *  
@@ -56,28 +59,56 @@ public abstract class Indice implements Serializable {
 	 */
 	public abstract List<Ocorrencia> getListOccur(String termo);
 
+
 	/**
 	 * Conclui a indexação, fazendo algum processamento (se necessário)
 	 */
 	public void concluiIndexacao(){
 		
 	}
-	
+
+
 	/**
-	 * Grava o índice em arquivo 
+	 * Grava o índice em arquivo
 	 */
-	public void gravarIndice(File arq){
-		
+	public void gravarIndice(File arq) {
+		try {
+			OutputStream outStream = new FileOutputStream(arq);
+			ObjectOutputStream objStream = new ObjectOutputStream(outStream);
+			objStream.writeObject(this);
+			objStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
-	
+
+
 	/**
 	 * Le o indice em um determinado arquivo
 	 * @param arq
 	 * @return
 	 */
-	public static Indice leIndice(File arq){
-		return null;
+	public static Indice leIndice(File arq) {
+		IndiceLight indice = null;
+		try {
+			InputStream inStream = new FileInputStream(arq);
+			ObjectInputStream objStream = new ObjectInputStream(inStream);
+			indice = (IndiceLight) objStream.readObject();
+			objStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return indice;
 	}
+
+
 	public String toString(){
 		StringBuffer str = new StringBuffer();
 		for(String termo : getListTermos()){
