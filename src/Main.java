@@ -1,4 +1,5 @@
 import indice.estrutura.IndiceLight;
+import indice.estrutura.Indice;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tartarus.snowball.ext.portugueseStemmer;
@@ -31,10 +32,10 @@ public class Main{
         // Grava indice em arquivo
         File file = new File("indice.dat");
         indice.gravarIndice(file);
-        /*  Carrega índice de arquivo
+        /*  Carrega índice de arquivo*/
         file = new File("../indice.dat");
         IndiceLight novo = (IndiceLight) Indice.leIndice(file);
-        */
+
     }
 
 	public static String stemming(String word){
