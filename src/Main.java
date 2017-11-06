@@ -1,4 +1,3 @@
-import indice.estrutura.Indice;
 import indice.estrutura.IndiceLight;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,7 +29,7 @@ public class Main{
         System.out.println("Total de termos indexados: "+indice.getListTermos().size());
 
         // Grava indice em arquivo
-        File file = new File("../indice.dat");
+        File file = new File("indice.dat");
         indice.gravarIndice(file);
         /*  Carrega índice de arquivo
         file = new File("../indice.dat");
@@ -111,7 +110,6 @@ public class Main{
                     docid++;
                 }
             }
-            break;
         }
     }
 }
