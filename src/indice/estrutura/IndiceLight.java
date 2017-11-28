@@ -160,7 +160,7 @@ public class IndiceLight extends Indice
 		int idx = arrTermId[0];
 		int count = 1;
 		int firstOccurrence = 0;
-		for(int i = 1; i < lastIdx; ++i) {
+		for(int i = 1; i <= lastIdx; ++i) {
 			if (arrTermId[i] == idx) {
 				count++;
 				continue;

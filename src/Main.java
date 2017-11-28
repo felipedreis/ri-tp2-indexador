@@ -15,8 +15,7 @@ public class Main{
     private static IndiceLight indice = new IndiceLight(15000000);
 
     public static void main(String[] args) throws IOException {
-
-        String main_folder_pathname = "../wikiSample";
+        String main_folder_pathname = "./wikiSample/";
 
         long startTime = System.currentTimeMillis();
         processaDocumentos(main_folder_pathname);
@@ -33,7 +32,7 @@ public class Main{
         File file = new File("indice.dat");
         indice.gravarIndice(file);
         /*  Carrega índice de arquivo*/
-        file = new File("../indice.dat");
+        file = new File("./indice.dat");
         IndiceLight novo = (IndiceLight) Indice.leIndice(file);
 
     }
@@ -85,7 +84,7 @@ public class Main{
         assert listOfFolders != null;
         for (int i = 0; i < listOfFolders.length; i++) {
             if (listOfFolders[i].isDirectory()) {
-                File folder = new File("../wikiSample/" + listOfFolders[i].getName());
+                File folder = new File("./wikiSample/" + listOfFolders[i].getName());
                 System.out.println("Indexando pasta: "+listOfFolders[i].getName());
                 File[] listOfFiles = folder.listFiles();
                 assert listOfFiles != null;
