@@ -128,12 +128,12 @@ public class StringUtil {
 	/**
 	 * @author Higor/Vinícius/Renan/Felipe
 	 */
-	public static Set<String> retiraStopWords(String text){
+	public static ArrayList<String> retiraStopWords(String text){
 		// retira a pontuacao do texto
 		String new_text = text.replaceAll("[\\[\\].,\\/#!$%\\^&\\*;:{}=\\-_`~()—\"]", "");
 		// divide o texto em uma lista de palavras
 		String[] words = new_text.split("\\s+");
-		Set<String> nonStopwords = new HashSet<String>();
+		ArrayList<String> nonStopwords = new ArrayList<String>();
 		for (int i = 0;i < words.length;i++){
 			if(!isStopWord(words[i].toLowerCase())){
 				nonStopwords.add(words[i].toLowerCase());

@@ -1,5 +1,6 @@
 import indice.estrutura.IndiceLight;
 import indice.estrutura.Indice;
+import indice.estrutura.Ocorrencia;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tartarus.snowball.ext.portugueseStemmer;
@@ -10,6 +11,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main{
     private static IndiceLight indice = new IndiceLight(15000000);
@@ -27,14 +30,24 @@ public class Main{
         System.out.print("Numero de documentos indexados: ");
         System.out.println(indice.getNumDocumentos());
         System.out.println("Total de termos indexados: "+indice.getListTermos().size());
+        System.out.println("Termos indexados:");
+
+        // Debug
+        /*for(String termo : indice.getListTermos()){
+            System.out.print(termo+": ");
+            for(Ocorrencia occurr : indice.getListOccur(termo)){
+                System.out.print(occurr.toString() + " ");
+            }
+            System.out.println("");
+        }*/
+
 
         // Grava indice em arquivo
         File file = new File("indice.dat");
         indice.gravarIndice(file);
-        /*  Carrega índice de arquivo*/
+        //Carrega índice de arquivo
         file = new File("./indice.dat");
         IndiceLight novo = (IndiceLight) Indice.leIndice(file);
-
     }
 
 	public static String stemming(String word){
@@ -54,7 +67,7 @@ public class Main{
         return wordStemmed;
     }
 
-	public static void indexacao(Set<String> nonStopwords,int docid){
+	public static void indexacao(ArrayList<String> nonStopwords,int docid){
         // mapa que conta a frequencia de cada termo em um documento
         Map<String,Integer> freq_termos = new HashMap<String,Integer>();
         String wordStemmed;
@@ -70,10 +83,10 @@ public class Main{
                 freq_termos.put(wordStemmed,freq);
             }
         }
+
         // indexa os termos apos o stemming e calculo da frequencia
-        for(String word: nonStopwords) {
-            wordStemmed = stemming(word);
-            indice.index(wordStemmed,docid,freq_termos.get(wordStemmed));
+        for(String word: freq_termos.keySet()) {
+            indice.index(word, docid, freq_termos.get(word));
         }
     }
 
@@ -90,6 +103,12 @@ public class Main{
                 assert listOfFiles != null;
                 for (int j = 0; j < listOfFiles.length; j++) {
                     String filename = listOfFiles[j].toString();
+                    Pattern pattern = Pattern.compile("[0-9]*.html$");
+                    Matcher matcher = pattern.matcher(filename);
+                    if(matcher.find()){
+                        String docidStr = matcher.group(0).replaceAll(".html","");
+                        docid = Integer.parseInt(docidStr);
+                    }
                     File file = new File(filename);
                     StringBuilder fileContent = new StringBuilder();
                     try {
@@ -104,10 +123,9 @@ public class Main{
                     Document doc = Jsoup.parse(String.valueOf(fileContent));
                     String text = doc.body().text();
                     text = StringUtil.replaceAcento(text);
-                    Set<String> nonStopwords;
+                    ArrayList<String> nonStopwords;
                     nonStopwords = StringUtil.retiraStopWords(text);
                     indexacao(nonStopwords,docid);
-                    docid++;
                 }
             }
         }
